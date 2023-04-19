@@ -45,7 +45,7 @@ class Warehouse:
         query = (
             "MATCH (u: Warehouse{warehouse_id: $warehouse_id})"
             "MATCH (l: Location{location_id: $address_id})"
-            "CREATE (u)-[r:located_in {apt: $apt}]->(l)"
+            "CREATE (u)-[r:located_in]->(l)"
             "RETURN r"
         )
         res = tnx.run(query, warehouse_id=warehouse_id, address_id=address.id, apt=address.apt)
