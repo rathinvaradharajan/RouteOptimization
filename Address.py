@@ -6,3 +6,6 @@ class Address:
         self.state = state
         self.zip_code = zip_code
         self.id = str(street) + " " + str(zip_code)
+
+    def to_address_str(self):
+        return f"{self.street}, {self.city}, {self.state} {self.zip_code}"

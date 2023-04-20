@@ -1,8 +1,9 @@
 from neo4j import GraphDatabase
-from User import User
+from UserService import UserService
 from Address import Address
 from Warehouse import Warehouse
 from Item import Item
+from UserProfile import UserProfile
 import logging
 
 
@@ -15,27 +16,29 @@ def main():
     password = '_0ctfmLWjOEH8hcEMPNKYQ0MSX8pZb4_aLDhV8pTnMY'
     uri = 'neo4j+s://98ff9419.databases.neo4j.io'
     driver = connect(uri, username, password)
-    user = User(driver)
-    user_address = Address(street="463 Park Dr", apt="4", state="MA",
-                           city="Boston", zip_code="02215")
-    # user.create_user(user_id="ratz19", name="Rathin", address=user_address)
-    print(user.find_one("ratz19"))
-
-    # Creating warehouse
-    warehouse = Warehouse(driver)
-    warehouse_address = Address(street="45 Lyman St", apt="1", state="MA",
-                                city="Westborough", zip_code="01581")
-    #warehouse.create(warehouse_id="wareh01", name="Brainstorm Inc", address=warehouse_address)
-    print(warehouse.find_one("wareh01"))
+    # user = UserService(driver)
+    # user_address = Address(street="463 Park Dr", apt="4", state="MA",
+    #                        city="Boston", zip_code="02215")
+    # # user.create_user(user_id="ratz19", name="Rathin", address=user_address)
+    # print(user.find_one("ratz19"))
+    #
+    # # Creating warehouse
+    # warehouse = Warehouse(driver)
+    # warehouse_address = Address(street="45 Lyman St", apt="1", state="MA",
+    #                             city=", Westborough", zip_code="01581")
+    # warehouse.create(warehouse_id="wareh01", name="Brainstorm Inc", address=warehouse_address)
+    # print(warehouse.find_one("wareh01"))
+    user_profile = UserProfile(driver)
+    user_profile.run()
 
     # Creating item
-    item = Item(driver)
-    val = item.create(item_id="it01", description="nand", size="21",
-                quantity="100", warehouse_id="wareh01")
-    if val:
-        print(item.find_one("it01"))
-    else:
-        print("Warehouse not found")
+    # item = Item(driver)
+    # val = item.create(item_id="it01", description="nand", size="21",
+    #             quantity="100", warehouse_id="wareh01")
+    # if val:
+    #     print(item.find_one("it01"))
+    # else:
+    #     print("Warehouse not found")
 
     driver.close()
 
