@@ -1,9 +1,11 @@
 from neo4j import GraphDatabase
+from ItemController import ItemController
 from UserService import UserService
 from Address import Address
 from Warehouse import Warehouse
 from Item import Item
 from UserProfile import UserProfile
+from WarehouseController import WarehouseController
 import logging
 
 
@@ -32,14 +34,24 @@ def main():
     # user_profile.run()
 
     # Creating item
-    item = Item(driver)
+    #item = Item(driver)
     # val = item.create(item_id="it02", name="Samsung Galaxy S10", description="Phone", size="12",
     #             quantity="55", warehouse_id="wareh01")
     # if val:
     #     print(item.find_one("it01"))
     # else:
     #     print("Warehouse not found")
-    print(item.find_all())
+
+    #print(item.find_all())
+
+    # Warehouse Controller
+    # warehouse_controller = WarehouseController(driver)
+    # warehouse_controller.run()
+
+    # Item Controller
+    # item_controller = ItemController(driver)
+    # item_controller.run()
+
     driver.close()
 
 

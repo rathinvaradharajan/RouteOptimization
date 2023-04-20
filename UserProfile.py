@@ -27,7 +27,7 @@ class UserProfile:
             user_name = input("Enter your username: ")
             user = self.userService.find_one(user_name)
             if user is None:
-                print("User doesn't create.")
+                print("User doesn't exists.")
                 is_create_user = input("Do you want to create a new user? (Y/N) ")
                 if is_create_user == "Y" or is_create_user == "y":
                     return self._create_user(user_name)

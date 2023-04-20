@@ -52,12 +52,52 @@ class Warehouse:
         return to_array(res)
 
     @staticmethod
+    def _delete_located_in_relationship(tnx: ManagedTransaction, warehouse_id):
+        query = (
+            "MATCH (u: Warehouse{warehouse_id: $warehouse_id})-[r:located_in]->()"
+            "DELETE r"
+        )
+        res = tnx.run(query, warehouse_id=warehouse_id)
+        return to_array(res)
+
+    @staticmethod
     def _find_warehouse(tnx: ManagedTransaction, warehouse_id):
         query = (
             "MATCH (u: Warehouse{warehouse_id: $warehouse_id})-[r:located_in]-(a: Location)"
             "RETURN u, a"
         )
         res = tnx.run(query, warehouse_id=warehouse_id)
+        data = to_array(res.data())
+        return data
+
+    @staticmethod
+    def _find_item_quantity(tnx: ManagedTransaction, warehouse_id, item_id):
+        query = (
+            "MATCH (u: Item{item_id: $item_id})-[rel:stored_in]-(w:Warehouse{warehouse_id: $warehouse_id})"
+            "RETURN rel.quantity"
+        )
+        res = tnx.run(query, item_id=item_id, warehouse_id=warehouse_id)
+        data = to_array(res.data())
+        return data
+
+    @staticmethod
+    def _remove_warehouse(tnx: ManagedTransaction, warehouse_id):
+        query = (
+            "MATCH (n: Warehouse {warehouse_id: $warehouse_id})"
+            "DELETE n"
+        )
+        res = tnx.run(query, warehouse_id=warehouse_id)
+        data = to_array(res.data())
+        return data
+
+    @staticmethod
+    def _update_warehouse_name(tnx: ManagedTransaction, warehouse_id, name):
+        query = (
+            "MATCH (p:Warehouse {warehouse_id: $warehouse_id}) "
+            "SET p.name = $name "
+            "RETURN p"
+        )
+        res = tnx.run(query, warehouse_id=warehouse_id, name=name)
         data = to_array(res.data())
         return data
 
@@ -72,11 +112,29 @@ class Warehouse:
     def find_one(self, warehouse_id):
         with self.driver.session(database="neo4j") as session:
             data = session.execute_read(self._find_warehouse, warehouse_id)
-            if len(data) > 1:
-                raise Exception
+            if len(data) == 0 or len(data) > 1:
+                return None
             first = data[0]
             warehouse, address = first['u'], first['a']
             return {
                 "warehouse": warehouse,
                 "address": address
             }
+
+    def find_item_quantity(self, warehouse_id, item_id):
+        with self.driver.session(database="neo4j") as session:
+            data = session.execute_read(self._find_item_quantity, warehouse_id, item_id)
+            if len(data) == 0 or len(data) > 1:
+                return None
+            return data[0]['rel.quantity']
+
+    def remove_warehouse(self, warehouse_id):
+        with self.driver.session(database="neo4j") as session:
+            _ = session.execute_write(self._delete_located_in_relationship, warehouse_id)
+            _ = session.execute_write(self._remove_warehouse, warehouse_id)
+            return 1
+
+    def update_warehouse_name(self, warehouse_id, name):
+        with self.driver.session(database="neo4j") as session:
+            _ = session.execute_write(self._update_warehouse_name, warehouse_id, name)
+            return 1
