@@ -2,6 +2,7 @@ from neo4j import GraphDatabase
 from User import User
 from Address import Address
 from Warehouse import Warehouse
+from Item import Item
 import logging
 
 
@@ -26,6 +27,15 @@ def main():
                                 city="Westborough", zip_code="01581")
     #warehouse.create(warehouse_id="wareh01", name="Brainstorm Inc", address=warehouse_address)
     print(warehouse.find_one("wareh01"))
+
+    # Creating item
+    item = Item(driver)
+    val = item.create(item_id="it01", description="nand", size="21",
+                quantity="100", warehouse_id="wareh01")
+    if val:
+        print(item.find_one("it01"))
+    else:
+        print("Warehouse not found")
 
     driver.close()
 
