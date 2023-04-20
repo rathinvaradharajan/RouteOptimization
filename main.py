@@ -23,8 +23,8 @@ def main():
     # Creating warehouse
     warehouse = Warehouse(driver)
     warehouse_address = Address(street="45 Lyman St", apt="1", state="MA",
-                                city=", Westborough", zip_code="01581")
-    warehouse.create(warehouse_id="wareh01", name="Brainstorm Inc", address=warehouse_address)
+                                city="Westborough", zip_code="01581")
+    #warehouse.create(warehouse_id="wareh01", name="Brainstorm Inc", address=warehouse_address)
     print(warehouse.find_one("wareh01"))
 
     driver.close()

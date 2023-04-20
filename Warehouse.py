@@ -48,14 +48,14 @@ class Warehouse:
             "CREATE (u)-[r:located_in]->(l)"
             "RETURN r"
         )
-        res = tnx.run(query, warehouse_id=warehouse_id, address_id=address.id, apt=address.apt)
+        res = tnx.run(query, warehouse_id=warehouse_id, address_id=address.id)
         return to_array(res)
 
     @staticmethod
     def _find_warehouse(tnx: ManagedTransaction, warehouse_id):
         query = (
             "MATCH (u: Warehouse{warehouse_id: $warehouse_id})-[r:located_in]-(a: Location)"
-            "RETURN u, r.apt, a"
+            "RETURN u, a"
         )
         res = tnx.run(query, warehouse_id=warehouse_id)
         data = to_array(res.data())
@@ -75,9 +75,8 @@ class Warehouse:
             if len(data) > 1:
                 raise Exception
             first = data[0]
-            warehouse, apt, address = first['u'], first['r.apt'], first['a']
+            warehouse, address = first['u'], first['a']
             return {
                 "warehouse": warehouse,
-                "apt": apt,
                 "address": address
             }
