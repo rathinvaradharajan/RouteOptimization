@@ -31,6 +31,8 @@ class UserProfile:
                 is_create_user = input("Do you want to create a new user? (Y/N) ")
                 if is_create_user == "Y" or is_create_user == "y":
                     return self._create_user(user_name)
+                else:
+                    return None
             else:
                 return user
 
@@ -61,6 +63,8 @@ class UserProfile:
 
     def run(self):
         user_details = self._greet_user()
+        if user_details is None:
+            return
         print(f"----------------------- Welcome {user_details['user']['name']} -----------------------")
         print("1. Place an Order")
         print("2. View past orders")
