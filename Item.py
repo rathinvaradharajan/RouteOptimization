@@ -16,12 +16,12 @@ class Item:
         return to_array(result)
 
     @staticmethod
-    def _create_item(tnx: ManagedTransaction, item_id, description, size):
+    def _create_item(tnx: ManagedTransaction, item_id, name, description, size):
         query = (
-            "CREATE (p: Item {item_id: $item_id, description: $description, size: $size})"
+            "CREATE (p: Item {item_id: $item_id, name: $name, description: $description, size: $size})"
             "RETURN p"
         )
-        warehouse = tnx.run(query, item_id=item_id, description=description, size=size)
+        warehouse = tnx.run(query, item_id=item_id, name=name, description=description, size=size)
         return to_array(warehouse)
 
     @staticmethod
@@ -46,12 +46,21 @@ class Item:
         data = to_array(res.data())
         return data
 
-    def create(self, item_id, description, size, quantity, warehouse_id):
+    @staticmethod
+    def _find_all(tnx: ManagedTransaction):
+        query = (
+            "MATCH (u: Item)"
+            "RETURN u"
+        )
+        res = tnx.run(query)
+        return to_array(res.data())
+
+    def create(self, item_id, name, description, size, quantity, warehouse_id):
         with self.driver.session(database="neo4j") as session:
             queried_address = session.execute_read(self._find_warehouse, warehouse_id)
             if len(queried_address) == 0:
                 return 0
-            _ = session.execute_write(self._create_item, item_id, description, size)
+            _ = session.execute_write(self._create_item, item_id, name, description, size)
             _ = session.execute_write(self._create_stored_in_relationship, item_id,
                                       warehouse_id, quantity)
             return 1
@@ -67,3 +76,8 @@ class Item:
                 "item": item,
                 "warehouse": warehouse
             }
+
+    def find_all(self):
+        with self.driver.session(database="neo4j") as session:
+            data = session.execute_read(self._find_all)
+            return data

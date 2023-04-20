@@ -28,18 +28,18 @@ def main():
     #                             city=", Westborough", zip_code="01581")
     # warehouse.create(warehouse_id="wareh01", name="Brainstorm Inc", address=warehouse_address)
     # print(warehouse.find_one("wareh01"))
-    user_profile = UserProfile(driver)
-    user_profile.run()
+    # user_profile = UserProfile(driver)
+    # user_profile.run()
 
     # Creating item
-    # item = Item(driver)
-    # val = item.create(item_id="it01", description="nand", size="21",
-    #             quantity="100", warehouse_id="wareh01")
+    item = Item(driver)
+    # val = item.create(item_id="it02", name="Samsung Galaxy S10", description="Phone", size="12",
+    #             quantity="55", warehouse_id="wareh01")
     # if val:
     #     print(item.find_one("it01"))
     # else:
     #     print("Warehouse not found")
-
+    print(item.find_all())
     driver.close()
 
 
