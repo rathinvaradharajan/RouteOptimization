@@ -51,23 +51,21 @@ class UserProfile:
         for it in items_arr:
             catalog[it['u']['item_id']] = {
                 'name': it['u']['name'],
-                'price': it['u']['price'],
+                'price': float(it['u']['price']),
                 'size': it['u']['size'],
                 'description': it['u']['description']
             }
-        print("S.NO\t", end="", flush=True)
-        print("Item ID\t\t", end="", flush=True)
-        print("Size\t\t", end="", flush=True)
-        print("Price\t\t\t", end="", flush=True)
-        print("Name\t\t\t\t\t\t", end="", flush=True)
-        print("Description")
+
+        print("{:<8} {:<8} {:<20} {:<45} {:<10}".format('S.No', 'Item ID', 'Name', 'Description', 'Price'))
         for i, (item_id, item_attr) in enumerate(catalog.items()):
-            print(f"{i}. ", end="\t\t", flush=True)
-            print(item_id, end="\t\t", flush=True)
-            print(item_attr['size'], end="\t\t\t", flush=True)
-            print(item_attr['price'], end="\t\t\t\t", flush=True)
-            print(item_attr['name'], end="\t\t\t\t\t\t", flush=True)
-            print(item_attr['description'])
+            print("{:<8} {:<8} {:<20} {:<45} $ {:<8}".format(
+                i+1,
+                item_id,
+                item_attr['name'],
+                item_attr['description'],
+                "{:,}".format(item_attr['price'])
+                )
+            )
 
         # prompt user for items to add in cart
         cart = []
@@ -108,27 +106,42 @@ class UserProfile:
             self._create_order_and_checkout(checkout_cart, total_price, user_details)
         return
 
+    def _view_order_details(self, order_id):
+        items = self.orderService.find_items_to_fill_order(order_id)
+        print("{:<8} {:<15} {:<10} {:<10}".format('Item Id', 'Name', 'Quantity', 'Price'))
+        for item in items:
+            price = "$ " + "{:,}".format(float(item['price']))
+            print("{:<8} {:<15} {:<10} {:<10}".format(
+                item['item_id'],
+                item['name'],
+                item['quantity'],
+                price
+            ))
+        return
+
     def _view_order(self, user):
         orders = self.orderService.find_all(user['user_id'])
-        print("S.NO\t", end="", flush=True)
-        print("Order ID\t\t\t\t\t\t\t\t\t", end="", flush=True)
-        print("Order Date\t\t\t\t", end="", flush=True)
-        print("Delivery Date\t\t\t\t", end="", flush=True)
-        print("Status")
+        print("{:<8} {:<40} {:<20} {:<20} {:<8}".format('S.No', 'Order Id', 'Order Date', 'Delivery Date', 'Status'))
         for i, order in enumerate(orders):
-            print(f"{i + 1}. ", end="\t\t", flush=True)
-            print(order['order_id'], end="\t\t", flush=True)
-            print(format_date(order['order_date']), end="\t\t", flush=True)
-            print(format_date(order['delivery_date']), end="\t\t", flush=True)
-            print(order['status'])
-        print("\n1.View order details\n2. Cancel order\n3.Exit")
-        op = input("Enter the operation")
-        if op in ['1', '2']:
-            idx = int(input("Enter the order no: "))
-            if op == '1':
-                pass
-            elif op == '2':
-                pass
+            print("{:<8} {:<40} {:<20} {:<20} {:<8}".format(
+                i+1,
+                order['order_id'],
+                format_date(order['order_date']),
+                format_date(order['delivery_date']),
+                order['status']
+                )
+            )
+        while True:
+            print("\n1.View order details\n2. Cancel order\n3.Exit")
+            op = input("Enter the operation: ")
+            if op in ['1', '2']:
+                idx = int(input("Enter the order no: "))
+                if op == '1':
+                    self._view_order_details(orders[idx-1]['order_id'])
+                elif op == '2':
+                    pass
+            else:
+                break
         return
 
     def _update_address(self, user):

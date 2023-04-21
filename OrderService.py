@@ -62,13 +62,13 @@ class OrderService:
         return apply_and_to_array(res.data(), selector)
 
     @staticmethod
-    def _find_items_to_fill_orders(tnx: ManagedTransaction, orders):
+    def _find_items_to_fill_orders(tnx: ManagedTransaction, order_id):
         find_query = (
             "MATCH (o: Order where o.order_id=$order_id)-[c:contains]-(i: Item)"
             "-[r:stored_in]->(w: Warehouse)-[:located_in]->(l: Location)"
             "RETURN i, c.quantity, r.quantity, w, l"
         )
-        res = tnx.run(find_query, order_id=orders)
+        res = tnx.run(find_query, order_id=order_id)
 
         def selector(x):
             item = x['i']
@@ -92,6 +92,6 @@ class OrderService:
         with self.driver.session(database="neo4j") as session:
             return session.execute_read(self._find_orders_due)
 
-    def find_items_to_fill_order(self, orders):
+    def find_items_to_fill_order(self, order_id):
         with self.driver.session(database="neo4j") as session:
-            return session.execute_read(self._find_items_to_fill_orders, orders)
+            return session.execute_read(self._find_items_to_fill_orders, order_id)

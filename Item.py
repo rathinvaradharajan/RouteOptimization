@@ -70,6 +70,7 @@ class Item:
         query = (
             "MATCH (u: Item)"
             "RETURN u"
+            " ORDER BY u.item_id"
         )
         res = tnx.run(query)
         return to_array(res.data())
