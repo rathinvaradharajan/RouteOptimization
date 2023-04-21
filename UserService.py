@@ -76,6 +76,7 @@ class UserService:
                 _ = session.execute_write(self._create_address, address)
             _ = session.execute_write(self._create_user, user_id, name)
             _ = session.execute_write(self._create_lives_in_relationship, user_id, address)
+            session.close()
 
     def find_one(self, user_id):
         with self.driver.session(database="neo4j") as session:
@@ -97,6 +98,7 @@ class UserService:
             if len(address_exits) == 0:
                 _ = session.execute_write(self._create_address, address)
             _ = session.execute_write(self._create_lives_in_relationship, user_id, address)
+            session.close()
 
 
 
