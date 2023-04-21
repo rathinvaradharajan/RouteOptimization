@@ -57,3 +57,41 @@ def compute_optimal_route(addresses: List[Address], distance_matrix: List[List[i
             e += 1
             res.append((u, v, w))
             unionfind.union(x, y)
+
+
+def compute_best_route(warehouses: List[Address], deliveries: List[Address]):
+    deliveries.insert(0, warehouses[-1])
+    graph = compute_distance_graph(deliveries)
+    V = len(graph[0])
+    source = 0
+    vertex = []
+    for i in range(V):
+        if i != source:
+            vertex.append(i)
+
+    # store minimum weight Hamiltonian Cycle
+    min_path = maxsize
+    min_path_order = []
+    next_permutation = permutations(vertex)
+    for i in next_permutation:
+
+        # store current Path weight(cost)
+        current_pathweight = 0
+
+        # compute current path weight
+        k = source
+        for j in i:
+            current_pathweight += graph[k][j]
+            k = j
+        current_pathweight += graph[k][source]
+
+        # update minimum
+        if current_pathweight < min_path:
+            min_path = current_pathweight
+            min_path_order = i
+    best_route = []
+    for i in range(warehouses):
+        best_route.append(i)
+    for i in range(1, min_path_order):
+        best_route.append(deliveries[i-1])
+    return best_route
