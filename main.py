@@ -1,6 +1,7 @@
 from neo4j import GraphDatabase
 from UserProfile import UserProfile
 from WarehouseController import WarehouseController
+from DriverProfile import DriverProfile
 
 
 def connect(uri, username, password):
@@ -17,6 +18,7 @@ def main():
 
         user_profile = UserProfile(driver)
         warehouse_cnt = WarehouseController(driver)
+        driver_profile = DriverProfile(driver)
 
         print("------------------------------ Welcome ------------------------------")
         print("Login as\n1. User\n2. Driver\n3. Warehouse Manager\n")
@@ -24,7 +26,7 @@ def main():
         if op == '1':
             user_profile.run()
         elif op == '2':
-            pass
+            driver_profile.run()
         elif op == '3':
             warehouse_cnt.run()
 

@@ -41,6 +41,45 @@ class OrderService:
         res = tnx.run(find_query, user_id=user_id)
         return apply_and_to_array(res.data(), lambda x: x['o'])
 
+    @staticmethod
+    def _find_orders_due(tnx: ManagedTransaction):
+        today = datetime.now() + timedelta(days=7)
+        find_query = (
+            "MATCH (o: Order where o.status <> 'completed' and o.delivery_date <= $today)"
+            "MATCH (o)-[:placed_by]-(:User)-[r:lives_in]->(l:Location)"
+            "return o, r.apt, l"
+            " LIMIT 10"
+        )
+
+        def selector(x):
+            order = x['o']
+            address = x['l']
+            address['apt'] = x['r.apt']
+            order['delivery_location'] = address
+            return order
+
+        res = tnx.run(find_query, today=today)
+        return apply_and_to_array(res.data(), selector)
+
+    @staticmethod
+    def _find_items_to_fill_orders(tnx: ManagedTransaction, orders):
+        find_query = (
+            "MATCH (o: Order where o.order_id=$order_id)-[c:contains]-(i: Item)"
+            "-[r:stored_in]->(w: Warehouse)-[:located_in]->(l: Location)"
+            "RETURN i, c.quantity, r.quantity, w, l"
+        )
+        res = tnx.run(find_query, order_id=orders)
+
+        def selector(x):
+            item = x['i']
+            item['quantity'] = x['c.quantity']
+            warehouse = x['l']
+            warehouse['available_quantity'] = x['r.quantity']
+            item['warehouse_location'] = warehouse
+            return item
+
+        return apply_and_to_array(res.data(), selector)
+
     def create(self, checkout_items, total_price, user_id):
         with self.driver.session(database="neo4j") as session:
             session.execute_write(self._create, checkout_items, total_price, user_id)
@@ -48,3 +87,11 @@ class OrderService:
     def find_all(self, user_id):
         with self.driver.session(database="neo4j") as session:
             return session.execute_read(self._find_all_orders_for_user, user_id)
+
+    def find_orders_due(self):
+        with self.driver.session(database="neo4j") as session:
+            return session.execute_read(self._find_orders_due)
+
+    def find_items_to_fill_order(self, orders):
+        with self.driver.session(database="neo4j") as session:
+            return session.execute_read(self._find_items_to_fill_orders, orders)
