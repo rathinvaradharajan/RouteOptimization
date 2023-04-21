@@ -2,6 +2,7 @@ from neo4j import Driver
 from Warehouse import Warehouse
 from Address import Address
 from Item import Item
+from ItemController import ItemController
 
 
 class WarehouseController:
@@ -9,6 +10,7 @@ class WarehouseController:
         self.driver = driver
         self.warehouseService = Warehouse(driver)
         self.itemService = Item(driver)
+        self.item_profile = ItemController(driver)
 
     def _create_warehouse(self, warehouse_id):
         print("----------------------- Creating new warehouse -----------------------")
@@ -55,7 +57,8 @@ class WarehouseController:
             print("\n------------- Warehouse Main Menu --------------")
             print("1. Create warehouse")
             print("2. Enter existing warehouse")
-            print("3. Exit warehouse menu")
+            print("3. Go to Items management")
+            print("4. Exit warehouse menu")
             ops = input("\nEnter your operation: ")
             print('')
 
@@ -73,6 +76,8 @@ class WarehouseController:
                 else:
                     return warehouse
             elif ops == '3':
+                self.item_profile.run()
+            elif ops == '4':
                 return None
             else:
                 print("Invalid Input.")
