@@ -3,7 +3,7 @@ from UserService import UserService
 from Address import Address
 from Item import Item
 from OrderService import OrderService
-from utils import format_date
+from utils import format_date, date_diff_to_today
 
 
 class UserProfile:
@@ -119,6 +119,16 @@ class UserProfile:
             ))
         return
 
+    def _cancel_order(self, order):
+        # check if cancel is possible
+        if order['status'] == 'Completed':
+            print("Can't cancel completed order!!")
+            return
+        if date_diff_to_today(order['delivery_date']) < 3:
+            print("Can't cancel since delivery date is less than 3 days away")
+            return
+        self.orderService.cancel_order(order['order_id'])
+
     def _view_order(self, user):
         orders = self.orderService.find_all(user['user_id'])
         print("{:<8} {:<40} {:<20} {:<20} {:<8}".format('S.No', 'Order Id', 'Order Date', 'Delivery Date', 'Status'))
@@ -135,11 +145,12 @@ class UserProfile:
             print("\n1.View order details\n2. Cancel order\n3.Exit")
             op = input("Enter the operation: ")
             if op in ['1', '2']:
-                idx = int(input("Enter the order no: "))
+                idx = int(input("Enter the order no: ")) - 1
                 if op == '1':
-                    self._view_order_details(orders[idx-1]['order_id'])
+                    self._view_order_details(orders[idx]['order_id'])
                 elif op == '2':
-                    pass
+                    self._cancel_order(orders[idx])
+                    break
             else:
                 break
         return

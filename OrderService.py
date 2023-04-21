@@ -80,6 +80,15 @@ class OrderService:
 
         return apply_and_to_array(res.data(), selector)
 
+    @staticmethod
+    def _cancel_order(tnx: ManagedTransaction, order_id):
+        query = (
+            "MATCH (o: Order where o.order_id=$order_id)-[c:contains]-(:Item)"
+            "SET o.status = 'Cancelled'"
+            "DELETE c"
+        )
+        tnx.run(query, order_id=order_id)
+
     def create(self, checkout_items, total_price, user_id):
         with self.driver.session(database="neo4j") as session:
             session.execute_write(self._create, checkout_items, total_price, user_id)
@@ -95,3 +104,7 @@ class OrderService:
     def find_items_to_fill_order(self, order_id):
         with self.driver.session(database="neo4j") as session:
             return session.execute_read(self._find_items_to_fill_orders, order_id)
+
+    def cancel_order(self, order_id):
+        with self.driver.session(database="neo4j") as session:
+            return session.execute_write(self._cancel_order, order_id)

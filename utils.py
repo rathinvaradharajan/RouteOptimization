@@ -13,3 +13,9 @@ def apply_and_to_array(a, func):
 
 def format_date(dt):
     return dt.strftime("%m/%d/%Y %H:%M:%S")
+
+
+def date_diff_to_today(dt):
+    now = datetime.now()
+    delta = dt - now
+    return delta.days
