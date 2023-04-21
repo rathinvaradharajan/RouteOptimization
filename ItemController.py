@@ -15,18 +15,20 @@ class ItemController:
             print("S.NO\t", end="", flush=True)
             print("Item ID\t\t", end="", flush=True)
             print("Size\t\t", end="", flush=True)
-            print("Name\t\t\t\t\t\t\t", end="", flush=True)
+            print("Price\t\t\t", end="", flush=True)
+            print("Name\t\t\t\t\t\t", end="", flush=True)
             print("Description")
             for item in items:
                 print(f"{i}. ", end="\t\t", flush=True)
                 print(item['u']['item_id'], end="\t\t", flush=True)
                 print(item['u']['size'], end="\t\t\t", flush=True)
-                print(item['u']['name'], end="\t\t\t\t", flush=True)
+                print(item['u']['price'], end="\t\t\t\t", flush=True)
+                print(item['u']['name'], end="\t\t\t\t\t\t", flush=True)
                 print(item['u']['description'])
                 i = i + 1
             return 1
         else:
-            print('No items available')
+            print('\nNo items available')
             return None
 
     def _add_item(self):
@@ -36,8 +38,9 @@ class ItemController:
             if item is None:
                 name = input("Enter the name for the item: ")
                 size = input("Enter the size for the item: ")
+                price = input("Enter the price for the item: ")
                 description = input("Enter the description for the item: ")
-                return self.itemService.create_item(item_id, name, description, size)
+                return self.itemService.create_item(item_id, name, description, size, price)
             else:
                 inp = input('Item ID already exists. Do you want to retry? (Y/N): ')
                 if inp.lower() == 'y':
@@ -59,8 +62,9 @@ class ItemController:
             else:
                 name = input("Enter the name for the item: ")
                 size = input("Enter the size for the item: ")
+                price = input("Enter the price for the item: ")
                 description = input("Enter the description for the item: ")
-                return self.itemService.update_item(item_id, name, description, size)
+                return self.itemService.update_item(item_id, name, description, size, price)
 
     def _remove_item(self):
         while True:

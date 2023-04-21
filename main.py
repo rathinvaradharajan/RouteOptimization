@@ -45,8 +45,8 @@ def main():
     #print(item.find_all())
 
     # Warehouse Controller
-    # warehouse_controller = WarehouseController(driver)
-    # warehouse_controller.run()
+    warehouse_controller = WarehouseController(driver)
+    warehouse_controller.run()
 
     # Item Controller
     # item_controller = ItemController(driver)

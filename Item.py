@@ -16,12 +16,12 @@ class Item:
         return to_array(result)
 
     @staticmethod
-    def _create_item(tnx: ManagedTransaction, item_id, name, description, size):
+    def _create_item(tnx: ManagedTransaction, item_id, name, description, size, price):
         query = (
-            "CREATE (p: Item {item_id: $item_id, name: $name, description: $description, size: $size})"
+            "CREATE (p: Item {item_id: $item_id, name: $name, description: $description, size: $size, price: $price})"
             "RETURN p"
         )
-        warehouse = tnx.run(query, item_id=item_id, name=name, description=description, size=size)
+        warehouse = tnx.run(query, item_id=item_id, name=name, description=description, size=size, price=price)
         return to_array(warehouse)
 
     @staticmethod
@@ -105,15 +105,16 @@ class Item:
         return to_array(res)
 
     @staticmethod
-    def _update_item(tnx: ManagedTransaction, item_id, name, description, size):
+    def _update_item(tnx: ManagedTransaction, item_id, name, description, size, price):
         query = (
             "MATCH (p:Item {item_id: $item_id}) "
             "SET p.name = $name "
             "SET p.description = $description "
             "set p.size = $size "
+            "set p.price = $price "
             "RETURN p"
         )
-        res = tnx.run(query, item_id=item_id, name=name, description=description, size=size)
+        res = tnx.run(query, item_id=item_id, name=name, description=description, size=size, price=price)
         return to_array(res)
 
     @staticmethod
@@ -135,19 +136,19 @@ class Item:
         return to_array(res)
 
     def create_item_and_add_to_warehouse(self, item_id, name, description, size, quantity,
-                                         warehouse_id):
+                                         warehouse_id, price):
         with self.driver.session(database="neo4j") as session:
             queried_address = session.execute_read(self._find_warehouse, warehouse_id)
             if len(queried_address) == 0:
                 return 0
-            _ = session.execute_write(self._create_item, item_id, name, description, size)
+            _ = session.execute_write(self._create_item, item_id, name, description, size, price)
             _ = session.execute_write(self._create_stored_in_relationship, item_id,
                                       warehouse_id, quantity)
             return 1
 
-    def create_item(self, item_id, name, description, size):
+    def create_item(self, item_id, name, description, size, price):
         with self.driver.session(database="neo4j") as session:
-            _ = session.execute_write(self._create_item, item_id, name, description, size)
+            _ = session.execute_write(self._create_item, item_id, name, description, size, price)
             return 1
 
     def find_one(self, item_id, warehouse):
@@ -203,9 +204,9 @@ class Item:
                                       warehouse_id, qty)
             return 1
 
-    def update_item(self, item_id, name, description, size):
+    def update_item(self, item_id, name, description, size, price):
         with self.driver.session(database="neo4j") as session:
-            _ = session.execute_write(self._update_item, item_id, name, description, size)
+            _ = session.execute_write(self._update_item, item_id, name, description, size, price)
             return 1
 
     def delete_item(self, item_id):

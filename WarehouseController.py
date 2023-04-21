@@ -42,7 +42,7 @@ class WarehouseController:
             warehouse = self.warehouseService.find_one(warehouse_id)
             if warehouse is None:
                 print("Warehouse Not Found.")
-                inp = input("Do you want to retry entering? (Y/N) ")
+                inp = input("Do you want to retry entering? (Y/N): ")
                 if inp.lower() == 'y':
                     continue
                 else:
@@ -64,7 +64,7 @@ class WarehouseController:
                 if warehouse is None:
                     continue
                 else:
-                    print('Warehouse created')
+                    print('\nWarehouse created')
                     return warehouse
             elif ops == "2":
                 warehouse = self._enter_warehouse_main()
@@ -87,6 +87,7 @@ class WarehouseController:
             print("Item ID\t\t", end="", flush=True)
             print("Size\t\t", end="", flush=True)
             print("Quantity\t\t", end="", flush=True)
+            print("Price\t\t", end="", flush=True)
             print("Item Name")
             for item in items:
                 quantity = self.warehouseService.find_item_quantity(
@@ -96,6 +97,7 @@ class WarehouseController:
                 print(item['u']['item_id'], end="\t\t", flush=True)
                 print(item['u']['size'], end="\t\t\t", flush=True)
                 print(quantity, end="\t\t\t\t", flush=True)
+                print(item['u']['price'], end="\t\t\t\t", flush=True)
                 print(item['u']['name'])
                 i = i + 1
             return 1
@@ -112,7 +114,7 @@ class WarehouseController:
                 item = self.itemService.find_one(item_id, True)
                 if item is None:
                     print('Invalid item')
-                    retry = input('Do you want to retry? Y/N')
+                    retry = input('Do you want to retry? Y/N: ')
                     if retry.lower() == 'y':
                         continue
                     else:
@@ -138,7 +140,7 @@ class WarehouseController:
                 item = self.itemService.find_one(item_id, True)
                 if item is None:
                     print('Invalid item')
-                    retry = input('Do you want to retry? Y/N')
+                    retry = input('Do you want to retry? Y/N: ')
                     if retry.lower() == 'y':
                         continue
                     else:
@@ -154,7 +156,9 @@ class WarehouseController:
                         return 0
 
     def _empty_warehouse(self, warehouse):
-        inp = input(f"Are you sure you want to empty the warehouse - "
+        if self._view_all_items(warehouse) is None:
+            return
+        inp = input(f"\nAre you sure you want to empty the warehouse - "
                     f"{warehouse['warehouse_id']} (Y/N)? ")
         if inp.lower() == 'y':
             ret = self.itemService.remove_all_item_from_warehouse(warehouse['warehouse_id'])
@@ -167,8 +171,8 @@ class WarehouseController:
         else:
             return
 
-    @staticmethod
-    def _check_details_of_warehouse(warehouse):
+    def _check_details_of_warehouse(self, warehouse):
+        warehouse = self.warehouseService.find_one(warehouse['warehouse']['warehouse_id'])
         warehouse_data = warehouse['warehouse']
         warehouse_address = warehouse['address']
         print('Warehouse Details')
@@ -201,18 +205,17 @@ class WarehouseController:
 
     def _add_item_to_warehouse(self, warehouse):
         while True:
-            item_id = input("\nEnter the item ID you want to add to this warehouse: ")
-            item = self.itemService.find_one(item_id, True)
+            item_id = input("Enter the item ID you want to add to this warehouse: ")
+            item = self.itemService.find_one(item_id, False)
             if item is None:
                 print('Invalid item')
-                retry = input('Do you want to retry? Y/N')
+                retry = input('Do you want to retry? Y/N: ')
                 if retry.lower() == 'y':
                     continue
                 else:
                     break
             else:
                 qty = input('Enter the quantity: ')
-                print(qty, warehouse['warehouse_id'], item_id, qty)
                 quantity = self.itemService.add_item_to_warehouse(warehouse['warehouse_id'],
                                                                   item_id, qty)
                 if quantity is not None:
@@ -229,7 +232,8 @@ class WarehouseController:
                 print('Exiting warehouse menu.')
                 return
             while True:
-                print(f"\n----------------------- Welcome to warehouse {warehouse_details['warehouse']['name']} -----------------------")
+                print(
+                    f"\n----------------------- Welcome to warehouse {warehouse_details['warehouse']['name']} -----------------------")
                 print("1. View all items in this warehouse")
                 print("2. Add an item to this warehouse")
                 print("3. Update an item quantity in this warehouse")
