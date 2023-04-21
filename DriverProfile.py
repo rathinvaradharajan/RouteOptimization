@@ -61,12 +61,9 @@ class DriverProfile:
     def run(self):
         print("--------------------- Welcome ---------------------")
         print("1. Start a delivery")
-        print("2. Report a traffic incident")
-        print("3. Exit\n")
+        print("2. Exit\n")
         ops = input("Enter your operation: ")
         if ops == '1':
             self._start_delivery()
-        elif ops == '2':
-            pass
-        elif ops == '3':
+        else:
             return

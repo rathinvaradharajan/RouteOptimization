@@ -45,7 +45,7 @@ class OrderService:
     def _find_orders_due(tnx: ManagedTransaction):
         today = datetime.now() + timedelta(days=7)
         find_query = (
-            "MATCH (o: Order where o.status <> 'completed' and o.delivery_date <= $today)"
+            "MATCH (o: Order where o.status = 'Initiated' and o.delivery_date <= $today)"
             "MATCH (o)-[:placed_by]-(:User)-[r:lives_in]->(l:Location)"
             "return o, r.apt, l"
             " LIMIT 10"
