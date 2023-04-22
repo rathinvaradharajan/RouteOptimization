@@ -128,6 +128,7 @@ class UserProfile:
             print("Can't cancel since delivery date is less than 3 days away")
             return
         self.orderService.cancel_order(order['order_id'])
+        print("Order cancelled")
 
     def _view_order(self, user):
         orders = self.orderService.find_all(user['user_id'])

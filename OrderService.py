@@ -83,8 +83,10 @@ class OrderService:
     @staticmethod
     def _cancel_order(tnx: ManagedTransaction, order_id):
         query = (
-            "MATCH (o: Order where o.order_id=$order_id)-[c:contains]-(:Item)"
+            "MATCH (o: Order where o.order_id=$order_id)"
             "SET o.status = 'Cancelled'"
+            "WITH o"
+            " MATCH (o)-[c:contains]-(:Item)"
             "DELETE c"
         )
         tnx.run(query, order_id=order_id)
