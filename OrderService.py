@@ -89,6 +89,23 @@ class OrderService:
         )
         tnx.run(query, order_id=order_id)
 
+    @staticmethod
+    def _update_order_status(tnx: ManagedTransaction, order_ids, status):
+        query = (
+            "MATCH (o: Order where o.order_id IN $order_ids)"
+            "SET o.status = $status"
+        )
+        tnx.run(query, order_ids=order_ids, status=status)
+
+    @staticmethod
+    def _update_item_counts(tnx: ManagedTransaction, order_ids):
+        query = (
+            "MATCH (o: Order where o.order_id IN $order_ids)-[c:contains]->(:Item)-[s:stored_in]->(:Warehouse)"
+            "SET s.quantity = s.quantity - c.quantity"
+            " RETURN s"
+        )
+        tnx.run(query, order_ids=order_ids)
+
     def create(self, checkout_items, total_price, user_id):
         with self.driver.session(database="neo4j") as session:
             session.execute_write(self._create, checkout_items, total_price, user_id)
@@ -108,3 +125,12 @@ class OrderService:
     def cancel_order(self, order_id):
         with self.driver.session(database="neo4j") as session:
             return session.execute_write(self._cancel_order, order_id)
+
+    def update_order_status(self, order_ids, status):
+        with self.driver.session(database="neo4j") as session:
+            return session.execute_write(self._update_order_status, order_ids, status)
+
+    def update_item_counts(self, order_ids):
+        with self.driver.session(database="neo4j") as session:
+            return session.execute_write(self._update_item_counts, order_ids)
+

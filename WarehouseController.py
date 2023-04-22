@@ -125,7 +125,7 @@ class WarehouseController:
                     else:
                         break
                 else:
-                    qty = input('Enter the quantity: ')
+                    qty = int(input('Enter the quantity: '))
                     print(qty, warehouse['warehouse_id'], item_id, qty)
                     quantity = self.itemService.update_item_quantity(warehouse['warehouse_id'],
                                                                      item_id, qty)
@@ -220,7 +220,7 @@ class WarehouseController:
                 else:
                     break
             else:
-                qty = input('Enter the quantity: ')
+                qty = int(input('Enter the quantity: '))
                 quantity = self.itemService.add_item_to_warehouse(warehouse['warehouse_id'],
                                                                   item_id, qty)
                 if quantity is not None:

@@ -8,4 +8,6 @@ class Address:
         self.id = str(street) + " " + str(zip_code)
 
     def to_address_str(self):
+        if self.apt != '':
+            return f"{self.street}, Apt: {self.apt}, {self.city}, {self.state} {self.zip_code}"
         return f"{self.street}, {self.city}, {self.state} {self.zip_code}"

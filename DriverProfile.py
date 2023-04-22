@@ -1,5 +1,7 @@
 from neo4j import Driver
 from OrderService import OrderService
+from Address import Address
+from Routes import compute_best_route
 
 
 size_dict = {
@@ -12,6 +14,21 @@ size_dict = {
     'XL': 100,
     'xl': 100
 }
+
+
+def create_address_for_warehouse(location):
+    address = Address(location['street'], '', location['city'], location['state'], location['zip'])
+    return address
+
+
+def create_address(order):
+    location = order['delivery_location']
+    apt = ''
+    if 'apt' in location:
+        apt = location['apt']
+    address = Address(location['street'], apt, location['city'], location['state'], location['zip'])
+    address.id = order['order_id']
+    return address
 
 
 class DriverProfile:
@@ -33,7 +50,16 @@ class DriverProfile:
 
     @staticmethod
     def _get_pick_up_locations(orders):
-        pass
+        locations_dict = {}
+        for order in orders:
+            for item in order['items']:
+                location = item['warehouse_location']
+                if location['location_id'] not in locations_dict:
+                    locations_dict[location['location_id']] = create_address_for_warehouse(location)
+        locations = []
+        for _, value in locations_dict.items():
+            locations.append(value)
+        return locations
 
     def _start_delivery(self):
         # select a vehicle
@@ -50,13 +76,38 @@ class DriverProfile:
         if len(filled_orders) == 0:
             print("You need a bigger vehicle for today's delivery")
             return
-        print(filled_orders)
+        filled_order_ids = [order['order_id'] for order in filled_orders]
         # compute pickup and delivery location
+        pickup_address = self._get_pick_up_locations(filled_orders)
+        delivery_address = [create_address(order) for order in filled_orders]
+        warehouses = len(pickup_address)
 
         # compute delivery route
+        best_route = compute_best_route(pickup_address, delivery_address)
+        i = 0
+        while i < warehouses:
+            print("Driver to Warehouse to pickup items: ")
+            print(f"\t {best_route[i].to_address_str()}\n")
+            op = input("Pick up done? (Y/N): ")
+            if op == 'Y' or op == 'y':
+                i += 1
+        # update order status and warehouse count
+        self.order_service.update_order_status(filled_order_ids, 'In Transit')
+        self.order_service.update_item_counts(filled_order_ids)
 
-        # start delivery route
-        pass
+        print("\n-----------------------------------------------------------")
+        print("\nDrive to perform deliveries...\n")
+        print(i, best_route)
+        while i < len(best_route):
+            curr_delivery = best_route[i]
+            print(f"Driver following location and deliver order #: {curr_delivery.id}")
+            print(f"\t {curr_delivery.to_address_str()}")
+            op = input("Deliver done? (Y/N)")
+            if op == 'y' or op == 'Y':
+                i += 1
+                # update order status
+                self.order_service.update_order_status([curr_delivery.id], 'Completed')
+        print("\n-----------------------------------------------------------\nDelivery done for the day. Yay!!")
 
     def run(self):
         print("--------------------- Welcome ---------------------")

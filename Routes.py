@@ -1,3 +1,5 @@
+from itertools import permutations
+from sys import maxsize
 from typing import List
 from Address import Address
 from Maps import get_distance_in_seconds
@@ -90,8 +92,8 @@ def compute_best_route(warehouses: List[Address], deliveries: List[Address]):
             min_path = current_pathweight
             min_path_order = i
     best_route = []
-    for i in range(warehouses):
-        best_route.append(i)
-    for i in range(1, min_path_order):
-        best_route.append(deliveries[i-1])
+    for i in range(len(warehouses)):
+        best_route.append(warehouses[i])
+    for i in range(len(min_path_order)):
+        best_route.append(deliveries[min_path_order[i]])
     return best_route

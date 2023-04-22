@@ -13,26 +13,26 @@ def main():
     username = 'neo4j'
     password = '_0ctfmLWjOEH8hcEMPNKYQ0MSX8pZb4_aLDhV8pTnMY'
     uri = 'neo4j+s://98ff9419.databases.neo4j.io'
-    try:
-        driver = connect(uri, username, password)
+    # try:
+    driver = connect(uri, username, password)
 
-        user_profile = UserProfile(driver)
-        warehouse_cnt = WarehouseController(driver)
-        driver_profile = DriverProfile(driver)
+    user_profile = UserProfile(driver)
+    warehouse_cnt = WarehouseController(driver)
+    driver_profile = DriverProfile(driver)
 
-        print("------------------------------ Welcome ------------------------------")
-        print("Login as\n1. User\n2. Driver\n3. Warehouse Manager\n")
-        op = input("Enter the option: ")
-        if op == '1':
-            user_profile.run()
-        elif op == '2':
-            driver_profile.run()
-        elif op == '3':
-            warehouse_cnt.run()
+    print("------------------------------ Welcome ------------------------------")
+    print("Login as\n1. User\n2. Driver\n3. Warehouse Manager\n")
+    op = input("Enter the option: ")
+    if op == '1':
+        user_profile.run()
+    elif op == '2':
+        driver_profile.run()
+    elif op == '3':
+        warehouse_cnt.run()
 
-        driver.close()
-    except Exception as e:
-        print("Unable to connect to DB. ", e)
+    driver.close()
+    # except Exception as e:
+    #     print("Unable to connect to DB. ", e)
 
 
 # Press the green button in the gutter to run the script.
