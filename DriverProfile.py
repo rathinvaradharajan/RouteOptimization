@@ -97,7 +97,6 @@ class DriverProfile:
 
         print("\n-----------------------------------------------------------")
         print("\nDrive to perform deliveries...\n")
-        print(i, best_route)
         while i < len(best_route):
             curr_delivery = best_route[i]
             print(f"Driver following location and deliver order #: {curr_delivery.id}")
