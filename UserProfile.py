@@ -166,8 +166,8 @@ class UserProfile:
         address = Address(street=street, apt=apt, city=city, state=state, zip_code=zip_code)
         self.userService.update_address(user['user_id'], address)
 
-    @staticmethod
-    def _view_profile(user_details):
+    def _view_profile(self, user_detail):
+        user_details = self.userService.find_one(user_detail["user"]['user_id'])
         user = user_details["user"]
         address = user_details["address"]
         print("----------------------- Profile -----------------------")
