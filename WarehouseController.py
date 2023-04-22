@@ -126,7 +126,6 @@ class WarehouseController:
                         break
                 else:
                     qty = int(input('Enter the quantity: '))
-                    print(qty, warehouse['warehouse_id'], item_id, qty)
                     quantity = self.itemService.update_item_quantity(warehouse['warehouse_id'],
                                                                      item_id, qty)
                     if quantity is not None:

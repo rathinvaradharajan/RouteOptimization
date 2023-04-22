@@ -159,7 +159,7 @@ class Item:
             else:
                 data = session.execute_read(self._find_item_individual, item_id)
 
-            if len(data) == 0 or len(data) > 1:
+            if len(data) == 0:
                 return None
             first = data[0]
 
