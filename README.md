@@ -45,7 +45,7 @@ An inventory manager can perform the following operations:
 5. Open the terminal and navigate to the project directory.
 6. Run pip install -r requirements.txt to install the dependencies.
 7. Start the Neo4j Database.
-8. Run python app.py to start the application.
+8. Run python main.py to start the application.
 
 # Conclusion
 The route optimization system is a useful tool for delivery operations to optimize their routes and minimize the total distance or time required to complete all deliveries while still satisfying all delivery constraints. The system provides different functionalities for customers, drivers, and inventory managers to manage their orders efficiently.
